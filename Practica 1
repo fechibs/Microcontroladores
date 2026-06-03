@@ -1,1 +1,190 @@
+#include <xc.h>         // Biblioteca principal del compilador XC8
+
+//=============================================================================
+// CONFIGURACION DE BITS DE CONFIGURACI N (FUSES)
+//=============================================================================
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 4 MHz)
+#pragma config FOSC = XT        // Oscillator Selection bits (XT oscillator)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = OFF      // Power-up Timer Enable bit (PWRT disabled)
+#pragma config BOREN = ON       // Brown-out Reset Enable bit (enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit (disabled)
+#pragma config CPD = OFF        // Data EEPROM Memory Code Protection (disabled)
+#pragma config WRT = OFF        // Flash Program Memory Write Enable (disabled)
+#pragma config CP = OFF         // Flash Program Memory Code Protection (disabled)
+
+//=============================================================================
+// DEFINICIONES
+//=============================================================================
+
+#define _XTAL_FREQ 8000000      // Frecuencia del oscilador (para __delay_ms y __delay_us)
+
+
+//EQUIPO ARES BRAULIO ZARATE MEDELLIN 609719 MARIA FERNANDA BAQUEDANO SANTOS 614028
+void main (void) {
+    TRISD = 0b00000000;
+    PORTD = 0b00000000;
+    int(i)=0;
+    while(1){
+        //ENCENDIDO LED
+        PORTD=0b00111111;
+        __delay_ms(500);   
+        PORTD=0x0;
+        __delay_ms(1000); 
+        //CONTADOR BINARIO
+        PORTD = 0b00000001;
+        __delay_ms(500);
+        PORTD = 0b00000010;
+        __delay_ms(500);
+        PORTD = 0b00000011;
+        __delay_ms(500);
+        PORTD = 0b00000100;
+        __delay_ms(500);
+        PORTD = 0b00000101;
+        __delay_ms(500);
+        PORTD = 0b00000110;
+        __delay_ms(500);
+        PORTD = 0b00000111;
+        __delay_ms(500);
+        PORTD = 0b00001000;
+        __delay_ms(500);
+        PORTD = 0b00001001;
+        __delay_ms(500);
+        PORTD = 0b00001010;
+        __delay_ms(500);
+        PORTD = 0b00001011;
+        __delay_ms(500);
+        PORTD = 0b00001100;
+        __delay_ms(500);
+        PORTD = 0b00001101;
+        __delay_ms(500);
+        PORTD = 0b00001110;
+        __delay_ms(500);
+        PORTD = 0b00001111;
+        __delay_ms(500);
+        PORTD = 0b00010000;
+        __delay_ms(500);
+        PORTD = 0b00010001;
+        __delay_ms(500);
+        PORTD = 0b00010010;
+        __delay_ms(500);
+        PORTD = 0b00010011;
+        __delay_ms(500);
+        PORTD = 0b00010100;
+        __delay_ms(500);
+        PORTD = 0b00010101;
+        __delay_ms(500);
+        PORTD = 0b00010110;
+        __delay_ms(500);
+        PORTD = 0b00010111;
+        __delay_ms(500);
+        PORTD = 0b00011000;
+        __delay_ms(500);
+        PORTD = 0b00011001;
+        __delay_ms(500);
+        PORTD = 0b00011010;
+        __delay_ms(500);
+        PORTD = 0b00011011;
+        __delay_ms(500);
+        PORTD = 0b00011100;
+        __delay_ms(500);
+        PORTD = 0b00011101;
+        __delay_ms(500);
+        PORTD = 0b00011110;
+        __delay_ms(500);
+        PORTD = 0b00011111;
+        __delay_ms(500);
+        PORTD = 0b00100000;
+        __delay_ms(500);
+        PORTD = 0b00100001;
+        __delay_ms(500);
+        PORTD = 0b00100010;
+        __delay_ms(500);
+        PORTD = 0b00100011;
+        __delay_ms(500);
+        PORTD = 0b00100100;
+        __delay_ms(500);
+        PORTD = 0b00100101;
+        __delay_ms(500);
+        PORTD = 0b00100110;
+        __delay_ms(500);
+        PORTD = 0b00100111;
+        __delay_ms(500);
+        PORTD = 0b00101000;
+        __delay_ms(500);
+        PORTD = 0b00101001;
+        __delay_ms(500);
+        PORTD = 0b00101010;
+        __delay_ms(500);
+        PORTD = 0b00101011;
+        __delay_ms(500);
+        PORTD = 0b00101100;
+        __delay_ms(500);
+        PORTD = 0b00101101;
+        __delay_ms(500);
+        PORTD = 0b00101110;
+        __delay_ms(500);
+        PORTD = 0b00101111;
+        __delay_ms(500);
+        PORTD = 0b00110000;
+        __delay_ms(500);
+        PORTD = 0b00110001;
+        __delay_ms(500);
+        PORTD = 0b00110010;
+        __delay_ms(500);
+        PORTD = 0b00110011;
+        __delay_ms(500);
+        PORTD = 0b00110100;
+        __delay_ms(500);
+        PORTD = 0b00110101;
+        __delay_ms(500);
+        PORTD = 0b00110110;
+        __delay_ms(500);
+        PORTD = 0b00110111;
+        __delay_ms(500);
+        PORTD = 0b00111000;
+        __delay_ms(500);
+        PORTD = 0b00111001;
+        __delay_ms(500);
+        PORTD = 0b00111010;
+        __delay_ms(500);
+        PORTD = 0b00111011;
+        __delay_ms(500);
+        PORTD = 0b00111100;
+        __delay_ms(500);
+        PORTD = 0b00111101;
+        __delay_ms(500);
+        PORTD = 0b00111110;
+        __delay_ms(500);
+        PORTD = 0b00111111;
+        __delay_ms(500);
+        PORTD = 0x0;
+        __delay_ms(1000);
+        //CAMINATA 
+        PORTD=0b00000001;
+         __delay_ms(500);
+         PORTD=0b00000010;
+         __delay_ms(500);
+         PORTD=0b00000100;
+         __delay_ms(500);
+         PORTD=0b00001000;
+         __delay_ms(500);
+         PORTD=0b0010000;
+         __delay_ms(500);
+         PORTD=0b00100000;
+        __delay_ms(500);
+        PORTD=0b0010000;
+         __delay_ms(500);
+         PORTD=0b00001000;
+         __delay_ms(500);        
+         PORTD=0b00000100;
+         __delay_ms(500);
+         PORTD=0b00000010;
+         __delay_ms(500);
+         PORTD=0b00000001;
+         __delay_ms(500);
+    }
+            
+}
 
