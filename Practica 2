@@ -1,0 +1,75 @@
+#include <xc.h>         // Biblioteca principal del compilador XC8
+
+//=============================================================================
+// CONFIGURACION DE BITS DE CONFIGURACI N (FUSES)
+//=============================================================================
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 4 MHz)
+#pragma config FOSC = XT        // Oscillator Selection bits (XT oscillator)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = OFF      // Power-up Timer Enable bit (PWRT disabled)
+#pragma config BOREN = ON       // Brown-out Reset Enable bit (enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit (disabled)
+#pragma config CPD = OFF        // Data EEPROM Memory Code Protection (disabled)
+#pragma config WRT = OFF        // Flash Program Memory Write Enable (disabled)
+#pragma config CP = OFF         // Flash Program Memory Code Protection (disabled)
+
+//=============================================================================
+// DEFINICIONES
+//=============================================================================
+
+#define _XTAL_FREQ 8000000      // Frecuencia del oscilador (para __delay_ms y __delay_us)
+
+//Definir patron
+unsigned char patrones[8] = {0x81,0x42,0x24,0x18,0x18,0x24,0x42,0x81};
+unsigned char patronM[8] ={0xFF,0x2,0x4,0x8,0x8,0x4,0x2,0xFF};
+unsigned char patronF[8] ={0xFF,0x11,0x11,0x11,0x11,0x1,0x1,0x1};
+unsigned char patronB[8] ={0xFF,0x99,0x99,0x99,0x99,0x99,0x99,0x66};
+unsigned char patronZ[8] ={0x81,0xC1,0xA1,0x91,0x89,0x85,0x83,0x81};
+void main (void) {
+    TRISB = 0; //FILAS
+    TRISD = 0; //COLUMNAS
+    PORTD = 0; 
+    PORTB = 0;
+    
+    while(1){
+      //CLASE
+      for(char j=0;j<25;j++){
+          for(char i=0;i<8;i++){
+                PORTB = 1<<i;
+                PORTD = ~patrones[i];
+                __delay_ms(5);
+            }
+      }
+      //ACTIVIDAD
+        for(char j=0;j<25;j++){
+            for(char i=0;i<8;i++){
+                PORTB = 1<<i;
+                PORTD = ~patronM[i];
+                __delay_ms(5);
+            }
+        }
+        for(char j=0;j<25;j++){
+            for(char i=0;i<8;i++){
+                PORTB = 1<<i;
+                PORTD = ~patronF[i];
+                __delay_ms(5);
+            }
+        }
+        for(char j=0;j<25;j++){
+            for(char i=0;i<8;i++){
+                PORTB = 1<<i;
+                PORTD = ~patronB[i];
+                __delay_ms(5);
+            }
+        }
+        for(char j=0;j<25;j++){
+            for(char i=0;i<8;i++){
+                PORTB = 1<<i;
+                PORTD = ~patronZ[i];
+                __delay_ms(5);
+            }
+        }
+    }
+}
+
