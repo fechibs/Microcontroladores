@@ -1,14 +1,32 @@
+Microcontroladores
+
+Integrantes
+  Braulio Zarate Medellín 609719
+  María Fernanda Baquedano Santos 614028
+
+Contenido
 Práctica 1
-- Código 1
-- Circuito 1
-- Simulacion 1
+  Código fuente
+  Archivo HEX 1
+  Archivo HEX 2
+  Circuito en formato imagen
+  Simulación de Proteus
 
 Práctica 2
-- Código 2
-- Circuito 2
-- Simulacion 2
+  Código fuente
+  Archivo HEX 1
+  Archivo HEX 2
+  Circuito en formato imagen
+  Simulación de Proteus
   
 Práctica 3
-- Código 3
-- Circuito 3
-- Simulacion 3
+  Código fuente
+  Archivo HEX 1
+  Archivo HEX 2
+  Circuito en formato imagen
+  Simulación de Proteus
+
+Software utilizado
+  MPLAB X IDE
+  Compilador XC8
+  Proteus
