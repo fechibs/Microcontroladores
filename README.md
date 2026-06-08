@@ -11,6 +11,7 @@ Práctica 1
   - Código fuente
   - Archivo HEX 1
   - Archivo HEX 2
+  - Archivo HEX 3
   - Circuito en formato imagen
   - Simulación de Proteus
 
