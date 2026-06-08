@@ -11,4 +11,4 @@ Práctica 2
 Práctica 3
 - Código 3
 - Circuito 3
-- - Simulacion 3
+- Simulacion 3
