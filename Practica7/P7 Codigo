@@ -57,7 +57,9 @@ void main (void){
 
         unsigned int volt = (adc_result *50000)/1023;
         unsigned int part_int = volt /10000; 
-        unsigned int par_dec = volt % 10000; 
+        unsigned int part_dec = volt % 10000; 
+        sprintf(buffer,"%u.%u", part_int, part_dec);
+        LCD_putrs(buffer);
         __delay_ms(200); 
     } 
 }
