@@ -1,0 +1,158 @@
+#include <xc.h>         // Biblioteca principal del compilador XC8
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <stdbool.h> 
+#include "lcd.h" 
+
+//=============================================================================
+// CONFIGURACI N DE BITS DE CONFIGURACI N (FUSES)
+//=============================================================================
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 4 MHz)
+#pragma config FOSC = XT        // Oscillator Selection bits (XT oscillator)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = OFF      // Power-up Timer Enable bit (PWRT disabled)
+#pragma config BOREN = ON       // Brown-out Reset Enable bit (enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit (disabled)
+#pragma config CPD = OFF        // Data EEPROM Memory Code Protection (disabled)
+#pragma config WRT = OFF        // Flash Program Memory Write Enable (disabled)
+#pragma config CP = OFF         // Flash Program Memory Code Protection (disabled)
+
+//=============================================================================
+// DEFINICIONES
+//=============================================================================
+
+#define _XTAL_FREQ 8000000      // Frecuencia del oscilador (para __delay_ms y __delay_us)
+#define LED PORTCbits.RC0
+
+volatile unsigned char state = 0;
+
+void ADC_Init(){
+    ANSEL = 0x03;
+    ANSELH = 0;
+    ADCON0 = 0x01;
+    ADCON1 = 0x80;
+}
+
+unsigned int ADC_Read(unsigned char channel){
+    __delay_ms(5);
+    ADCON0 &= 0x83; 
+    ADCON0 |= channel << 2; //Sustituir los bits del canal por el seleccionado
+    __delay_ms(2);
+    GO_nDONE = 1;
+    while(GO_nDONE);
+    return((ADRESH<<0)+ADRESL);
+}
+
+void main(void){
+    ANSEL = 0;
+    ANSELH = 0;
+    OPTION_REG = OPTION_REG & 0b01111111;
+    
+    TRISD = 0;
+    TRISC = 0;
+    TRISB = 0xFF;
+    
+    GIE = 1;
+    INTE = 1;
+    INTEDG = 0;
+    
+    char buffer1[10];
+    char buffer2[10];
+    
+    ADC_Init();
+    LCD lcd = (&PORTC, 2, 3, 4, 5, 6, 7);
+    LCD_Init(lcd);
+    
+    while(1){
+        unsigned int adc_result1 = ADC_Read(0);
+        unsigned int adc_result2 = ADC_Read(1);
+
+        LCD_Clear();
+
+        switch(state){
+
+            case 0: // VOLTAJE
+
+                LCD_Set_Cursor(0,0);
+                LCD_putrs("Voltaje 1:");
+
+                unsigned long volt1 = ((unsigned long)adc_result1 * 50000)/1023;
+                sprintf(buffer1,"%lu.%04lu",
+                        volt1/10000,
+                        volt1%10000);
+
+                LCD_Set_Cursor(0,11);
+                LCD_putrs(buffer1);
+
+                LCD_Set_Cursor(1,0);
+                LCD_putrs("Voltaje 2:");
+
+                unsigned long volt2 = ((unsigned long)adc_result2 * 50000)/1023;
+                sprintf(buffer2,"%lu.%04lu",
+                        volt2/10000,
+                        volt2%10000);
+
+                LCD_Set_Cursor(1,11);
+                LCD_putrs(buffer2);
+
+                break;
+
+            case 1: // PORCENTAJE
+
+                LCD_Set_Cursor(0,0);
+                LCD_putrs("Porcentaje1:");
+
+                sprintf(buffer1,"%u%%",
+                        (adc_result1*100)/1023);
+
+                LCD_Set_Cursor(0,12);
+                LCD_putrs(buffer1);
+
+                LCD_Set_Cursor(1,0);
+                LCD_putrs("Porcentaje2:");
+
+                sprintf(buffer2,"%u%%",
+                        (adc_result2*100)/1023);
+
+                LCD_Set_Cursor(1,12);
+                LCD_putrs(buffer2);
+
+                break;
+
+            case 2: // ADC
+
+                LCD_Set_Cursor(0,0);
+                LCD_putrs("ADC1:");
+
+                sprintf(buffer1,"%u",adc_result1);
+
+                LCD_Set_Cursor(0,6);
+                LCD_putrs(buffer1);
+
+                LCD_Set_Cursor(1,0);
+                LCD_putrs("ADC2:");
+
+                sprintf(buffer2,"%u",adc_result2);
+
+                LCD_Set_Cursor(1,6);
+                LCD_putrs(buffer2);
+
+                break;
+        }
+                
+        __delay_ms(100);
+    }
+}
+
+void __interrupt() ISR(void){
+    if(INTF){
+        INTF = 0;
+        GIE = 0; //DESACTIVAR OTRAS INTERRUPCIONES
+        state++; //EJECUTAR INTERRUPCION
+        if(state>2){
+            state=0;
+        }
+        GIE = 1; //REACTIVAR OTRASINTERRUPCIONES 
+    }
+}
