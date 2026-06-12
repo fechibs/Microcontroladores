@@ -81,7 +81,6 @@ void main (void){
                 sprintf(buffer,"%u", adc_result);
 
             }
-        
         }
         else{
             LCD_putrs("Voltaje: "); 
@@ -97,7 +96,7 @@ void main (void){
 void __interrupt() ISR(void){
     if(INTF){
         INTF = 0;
-        GIE = 0; //DESACTIVAR OTRAS INTERRUPCIONES
+        GIE = 0;
         estado =!estado; //EJECUTAR INTERRUPCION
         modo++;
         GIE = 1; //REACTIVAR OTRASINTERRUPCIONES 
