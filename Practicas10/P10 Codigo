@@ -30,13 +30,14 @@ char exec[6];
 //EQUIPO ARES BRAULIO ZARATE MEDELLIN 609719 MARIA FERNANDA BAQUEDANO SANTOS 614028 
 
 void Timer1_Init(){
-    T1CON = 0x0011000;
-    TMR1H = 0x9E;
+    T1CON = 0b00110001; //Bit 4-5 Preescaler el Bit 0 lo activa
+    TMR1H = 0x9E; // 65536 Separamos parte H y L
     TMR1L = 0x58;
     
-    TMR1IF = 0;
-    TMR1IE = 1;
+    TMR1IF = 0; //Bandera
+    TMR1IE = 1; //Habilita la interrupcion
     GIE = 1;
+    PEIE= 1;
 }
 
 void ADC_Init(){ 
@@ -54,7 +55,7 @@ unsigned int ADC_Read(){
 void __interrupt() ISR(void){
     if(TMR1IF){
         contador++;
-        if (contador>100){
+        if (contador>10){
             tiempo++;
             contador = 0;
         }
