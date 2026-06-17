@@ -1,0 +1,78 @@
+#include <xc.h>         // Biblioteca principal del compilador XC8
+
+//=============================================================================
+// CONFIGURACI N DE BITS DE CONFIGURACI N (FUSES)
+//=============================================================================
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 4 MHz)
+#pragma config FOSC = XT        // Oscillator Selection bits (XT oscillator)
+#pragma config WDTE = OFF       // Watchdog Timer Enable bit (WDT disabled)
+#pragma config PWRTE = OFF      // Power-up Timer Enable bit (PWRT disabled)
+#pragma config BOREN = ON       // Brown-out Reset Enable bit (enabled)
+#pragma config LVP = OFF        // Low-Voltage Programming Enable bit (disabled)
+#pragma config CPD = OFF        // Data EEPROM Memory Code Protection (disabled)
+#pragma config WRT = OFF        // Flash Program Memory Write Enable (disabled)
+#pragma config CP = OFF         // Flash Program Memory Code Protection (disabled)
+
+//=============================================================================
+// DEFINICIONES
+//=============================================================================
+
+#define _XTAL_FREQ 8000000      // Frecuencia del oscilador (para __delay_ms y __delay_us)
+#define LED PORTCbits.RC0
+
+unsigned char patron[10]={
+    0x3F,
+    0x6,
+    0x5B,
+    0x4F,
+    0x66,
+    0x6D,
+    0x7D,
+    0x7,
+    0x7F,
+    0x67
+};
+
+void blink_led(){
+    for(int i=0; i<4; i++){
+        LED = 1;
+        __delay_ms(500);
+        LED = 0;
+        __delay_ms(500);
+    }
+}
+
+void main(void){
+    ANSEL = 0;
+    ANSELH = 0;
+    OPTION_REG = OPTION_REG & 0b01111111;
+    
+    TRISC = 0;
+    TRISD = 0;
+    TRISB = 0xFF;
+    
+    PORTC = 0;
+    PORTD = 0;
+    
+    unsigned char count = 0;
+    
+    GIE = 1;
+    INTE = 1;
+    INTEDG = 0;
+    
+    while(1){
+        PORTD = patron[count];
+        count = (count+1)%10;
+        __delay_ms(500);
+    }
+}
+
+void __interrupt() ISR(void){
+    if(INTF){
+        GIE = 0; //DESACTIVAR OTRAS INTERRUPCIONES
+        blink_led(); //EJECUTAR INTERRUPCION
+        GIE = 1; //REACTIVAR OTRASINTERRUPCIONES
+        INTF = 0;
+    }
+}
