@@ -1,0 +1,77 @@
+#include <xc.h> // Biblioteca principal del compilador XC8 
+
+//============================================================================= 
+// CONFIGURACION DE BITS DE CONFIGURACI N (FUSES) 
+//============================================================================= 
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 8 MHz) 
+#pragma config FOSC = XT // Oscillator Selection bits (XT oscillator) 
+#pragma config WDTE = OFF // Watchdog Timer Enable bit (WDT disabled) 
+#pragma config PWRTE = OFF // Power-up Timer Enable bit (PWRT disabled) 
+#pragma config BOREN = ON // Brown-out Reset Enable bit (enabled) 
+#pragma config LVP = OFF // Low-Voltage Programming Enable bit (disabled) 
+#pragma config CPD = OFF // Data EEPROM Memory Code Protection (disabled) 
+#pragma config WRT = OFF // Flash Program Memory Write Enable (disabled) 
+#pragma config CP = OFF // Flash Program Memory Code Protection (disabled) 
+//============================================================================= 
+
+
+// DEFINICIONES //============================================================================= 
+#define _XTAL_FREQ 8000000 // Frecuencia del oscilador (para __delay_ms y __delay_us) 
+
+volatile unsigned int pulso;
+volatile unsigned char state = 0;
+
+void Timer1_Init(){
+    T1CON = 0b00110001; // TMR1CS(B1) TMR1CS(B2) T1CKPS1 T1CKPS0 T1OSCEN 'T1SYNC X TMR1ON
+    TMR1 = 65536 - 5000; //20ms
+    TMR1IE = 1;
+    TMR1IF = 0;
+    PEIE = 1;
+    GIE = 1;
+}
+
+void __interrupt() ISR(void){
+    if(TMR1IF){
+        TMR1IF = 0;
+        unsigned int t = pulso;
+        
+        if(state==0){
+            RC2 = 1;
+            TMR1 = 65536 - t;
+            state = 1;
+        }
+        else{
+            RC2 = 0;
+            TMR1 = 65536 - (5000 - t);
+            state = 0;
+        }
+    }
+}
+
+void main(void){
+    TRISC = 0;
+    
+    Timer1_Init();
+    unsigned int i;
+    
+    
+    while(1){
+        
+        pulso = 375;
+        for(i=0; i<=180; i+=5){
+            pulso = 250 + ((unsigned long)i * 250) / 180;
+            if(pulso < 250) pulso = 250;
+            if(pulso > 500) pulso = 500;
+            __delay_ms(50);
+        }
+        
+        for(i=180; i>=3; i-=5){
+            pulso = 250 + ((unsigned long)i * 250) / 180;
+            if(pulso < 250) pulso = 250;
+            if(pulso > 500) pulso = 500;
+            __delay_ms(50);
+        }
+        
+    }
+}
