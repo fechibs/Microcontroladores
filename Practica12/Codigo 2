@@ -1,0 +1,121 @@
+#include <xc.h> // Biblioteca principal del compilador XC8 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <stdbool.h> 
+#include "lcd.h"
+#include "Keypad.h"
+
+//============================================================================= 
+// CONFIGURACION DE BITS DE CONFIGURACI N (FUSES) 
+
+//============================================================================= 
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 8 MHz) 
+#pragma config FOSC = XT // Oscillator Selection bits (XT oscillator) 
+#pragma config WDTE = OFF // Watchdog Timer Enable bit (WDT disabled) 
+#pragma config PWRTE = OFF // Power-up Timer Enable bit (PWRT disabled) 
+#pragma config BOREN = ON // Brown-out Reset Enable bit (enabled) 
+#pragma config LVP = OFF // Low-Voltage Programming Enable bit (disabled) 
+#pragma config CPD = OFF // Data EEPROM Memory Code Protection (disabled) 
+#pragma config WRT = OFF // Flash Program Memory Write Enable (disabled) 
+#pragma config CP = OFF // Flash Program Memory Code Protection (disabled) 
+//============================================================================= 
+
+
+// DEFINICIONES //============================================================================= 
+#define _XTAL_FREQ 8000000 // Frecuencia del oscilador (para __delay_ms y __delay_us) 
+//EQUIPO ARES BRAULIO ZARATE MEDELLIN 609719 MARIA FERNANDA BAQUEDANO SANTOS 614028 
+
+volatile unsigned char i = 0;
+void main (void){
+    TRISC = 0x00;
+    PORTC = 0x00;
+    
+    LCD lcd ={&PORTC, 2, 3, 4, 5, 6, 7};
+    LCD_Init(lcd);
+    LCD_Clear();
+    
+    InitKeypad();
+
+    char opcion;
+    int numero1 = 0;
+    int numero2 = 0;
+    unsigned char decenas = 0;
+    char calculo = 0;
+    char buffer[16];
+    int paso = 0;
+    
+    while(1){
+        opcion=switch_press_scan();
+        if (opcion != 0) {
+            if (opcion >= '0' && opcion <= '9'){
+                LCD_putc(opcion);
+
+                int digito = opcion - '0';
+
+                if (paso == 0) {
+                    numero1 = (numero1 * 10) + digito; 
+                }
+                else {
+                    numero2 = (numero2 * 10) + digito; 
+                }
+            }
+            else if(opcion=='A'||opcion=='B'||opcion=='C'||opcion=='D'){
+                paso = 1;
+                if (opcion == 'A'){
+                    calculo = '+'; 
+                    LCD_putc('+');
+                }
+                if (opcion == 'B'){
+                    calculo = '-'; 
+                    LCD_putc('-');
+                }
+                if (opcion == 'C'){
+                    calculo = '*'; 
+                    LCD_putc('*');
+                }
+                if (opcion == 'D'){
+                    calculo = '/'; 
+                    LCD_putc('/');
+                }
+            }
+            else if (opcion=='#'){
+                LCD_Clear();
+                LCD_Set_Cursor(0,1);
+
+                if (calculo == '+'){
+                    sprintf(buffer, "Respuesta: %d",numero1 + numero2);
+                }
+                else if (calculo == '-'){
+                    sprintf(buffer, "Respuesta: %d",numero1 - numero2);
+                }
+                else if (calculo == '*'){
+                    sprintf(buffer, "Respuesta: %d",numero1 * numero2);
+                }
+                else if (calculo == '/'){
+                    unsigned int division= (unsigned long) numero1 * 10000 / numero2;
+                    unsigned int part_int = division / 10000; 
+                    unsigned int part_dec = division % 10000; 
+                    sprintf(buffer, "Respuesta: %u.%u", part_int, part_dec);
+                }
+
+                LCD_putrs(buffer);
+                while(switch_press_scan() == 0);
+                LCD_Clear();
+                numero1 = 0;
+                numero2 = 0;
+                calculo = 0;
+                paso = 0;
+
+            }
+            else if(opcion== '*'){
+                LCD_Clear();
+                numero1 = 0;
+                numero2 = 0;
+                calculo = 0;
+                paso = 0;
+            }
+        }
+             
+    }
+}
