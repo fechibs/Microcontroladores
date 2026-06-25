@@ -1,0 +1,54 @@
+#include <xc.h> // Biblioteca principal del compilador XC8 
+
+//============================================================================= 
+// CONFIGURACION DE BITS DE CONFIGURACI N (FUSES) 
+//============================================================================= 
+
+// Selecci n de oscilador (usar XT si est s usando un cristal de 8 MHz) 
+#pragma config FOSC = XT // Oscillator Selection bits (XT oscillator) 
+#pragma config WDTE = OFF // Watchdog Timer Enable bit (WDT disabled) 
+#pragma config PWRTE = OFF // Power-up Timer Enable bit (PWRT disabled) 
+#pragma config BOREN = ON // Brown-out Reset Enable bit (enabled) 
+#pragma config LVP = OFF // Low-Voltage Programming Enable bit (disabled) 
+#pragma config CPD = OFF // Data EEPROM Memory Code Protection (disabled) 
+#pragma config WRT = OFF // Flash Program Memory Write Enable (disabled) 
+#pragma config CP = OFF // Flash Program Memory Code Protection (disabled) 
+//============================================================================= 
+
+
+// DEFINICIONES //============================================================================= 
+#define _XTAL_FREQ 8000000 // Frecuencia del oscilador (para __delay_ms y __delay_us) 
+
+void ADC_Init(){ 
+    ANSEL = 0x03; 
+    ANSELH = 0; 
+    ADCON0 = 0x01; 
+    ADCON1 = 0x80;
+}
+
+unsigned int ADC_Read(unsigned char channel){ 
+    __delay_ms(5); 
+    ADCON0 &= 0x83; 
+    ADCON0 |= channel << 2; //Sustituir los bits del canal por el seleccionado 
+    __delay_ms(2); 
+    GO_nDONE = 1; 
+    while(GO_nDONE); 
+    return((ADRESH<<8)+ADRESL); 
+} 
+
+void main(void){
+    TRISC = 0;
+    CCP1CON = 0b00001100;
+    T2CON = 0b00000111;
+    
+    PR2 = 255;
+    
+    ADC_Init();
+    
+    while(1){
+        unsigned int ADC1 = ADC_Read(0);
+        unsigned int ADC8b1 = ADC1 >> 2;
+
+        CCPR1L = ADC8b1;
+    }
+}
