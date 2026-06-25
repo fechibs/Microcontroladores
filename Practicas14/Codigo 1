@@ -1,7 +1,13 @@
 #include <xc.h> // Biblioteca principal del compilador XC8 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <stdbool.h> 
+#include "lcd.h"
+#include "Keypad.h"
 
 //============================================================================= 
 // CONFIGURACION DE BITS DE CONFIGURACI N (FUSES) 
+
 //============================================================================= 
 
 // Selecci n de oscilador (usar XT si est s usando un cristal de 8 MHz) 
@@ -18,9 +24,14 @@
 
 // DEFINICIONES //============================================================================= 
 #define _XTAL_FREQ 8000000 // Frecuencia del oscilador (para __delay_ms y __delay_us) 
+//EQUIPO ARES BRAULIO ZARATE MEDELLIN 609719 MARIA FERNANDA BAQUEDANO SANTOS 614028 
 
-volatile unsigned int pulso;
-volatile unsigned char state = 0;
+volatile unsigned int pulso1 = 150;
+volatile unsigned int pulso2 = 150;
+volatile char state = 0;
+const  char* productos[9]= {"papitas", "gansito", "halls", 
+"refresco", "aguita", "juguito", "chicles","mazapan", "paletita"};
+
 
 void Timer1_Init(){
     T1CON = 0b00110001; // TMR1CS(B1) TMR1CS(B2) T1CKPS1 T1CKPS0 T1OSCEN 'T1SYNC X TMR1ON
@@ -34,44 +45,224 @@ void Timer1_Init(){
 void __interrupt() ISR(void){
     if(TMR1IF){
         TMR1IF = 0;
-        unsigned int t = pulso;
-        
-        if(state==0){
-            RC2 = 1;
-            TMR1 = 65536 - t;
+        if(state == 0){
+            RD0 = 1;
+            RD1 = 0;
+            TMR1 = 65536 - pulso1;
             state = 1;
         }
-        else{
-            RC2 = 0;
-            TMR1 = 65536 - (5000 - t);
+        else if (state == 1){
+            RD0 = 0;
+            RD1 = 1;
+            TMR1 = 65536 - pulso2;
+            state = 2;
+        }
+        else {
+            RD0 = 0;
+            RD1 = 0;
+            TMR1 = 65536 - (5000 - pulso1 - pulso2);
             state = 0;
         }
     }
 }
 
-void main(void){
-    TRISC = 0;
+void movserv(char numserv, int ang){
+    unsigned int pulsonuevo = 150 +((unsigned long)ang * 450) / 180;
+    GIE = 0;
+    if(numserv==1){
+        pulso1 = pulsonuevo;
+    }
+    if(numserv==2){
+        pulso2 = pulsonuevo;
+    }
+    GIE = 1;
+}
+
+void main (void){
+    TRISC = 0x00; //LCD
+    PORTC = 0x00;
+    TRISD = 0x00; //SERVOS
+    PORTD = 0x00;
     
+    LCD lcd ={&PORTC, 2, 3, 4, 5, 6, 7};
+    LCD_Init(lcd);
+    LCD_Clear();
+    
+    InitKeypad();
     Timer1_Init();
-    unsigned int i;
     
+    char opcion;
+    char buffer[16];
+    int i;
+    
+    //Inicia
+    
+    LCD_Set_Cursor(0,1); //Bienvenida
+    LCD_putrs("Welcome");
+    __delay_ms(1500);
+    LCD_Clear();
+    
+    LCD_Set_Cursor(0,1);
+    LCD_putrs("Select product"); //Instruccion
+    __delay_ms(1500);
+    LCD_Clear();
+    
+    LCD_Set_Cursor(0,1); // Productos
+    LCD_putrs("Options: 1-9");
+    LCD_Set_Cursor(1,1);
     
     while(1){
-        
-        pulso = 375;
-        for(i=0; i<=180; i+=5){
-            pulso = 250 + ((unsigned long)i * 250) / 180;
-            if(pulso < 250) pulso = 250;
-            if(pulso > 500) pulso = 500;
-            __delay_ms(50);
-        }
-        
-        for(i=180; i>=3; i-=5){
-            pulso = 250 + ((unsigned long)i * 250) / 180;
-            if(pulso < 250) pulso = 250;
-            if(pulso > 500) pulso = 500;
-            __delay_ms(50);
-        }
-        
+        opcion=switch_press_scan();
+        if (opcion != 0) {
+            if (opcion >= '1' && opcion <= '9'){
+                int num = opcion - '0';
+                int posicion = num - 1;
+                
+                int precio = 0;
+                
+                if (num%2 == 0){
+                    precio = 20;
+                }else{
+                    precio = 25;
+                }
+                
+                int pago = 0;
+                bool pagado = false;
+                char teclapago = 0;
+                
+                LCD_Clear();
+                __delay_ms(5);
+                LCD_Set_Cursor(0,0);
+                sprintf(buffer, "Price: $%d", precio);
+                LCD_putrs(buffer);
+                __delay_ms(1500);
+                
+                LCD_Clear();
+                LCD_Set_Cursor(0,1);
+                LCD_putrs("Pay:(Press 0)   ");
+                
+                while(1){
+                    teclapago = switch_press_scan();
+                    
+                    if(teclapago !=0){
+                        if (teclapago >= '0' && teclapago <= '9'){
+                            int digito = teclapago - '0';
+                            pago =(pago * 10) + digito;
+                            
+                            if(pago>99){
+                                pago = 99;
+                            }
+                            
+                            LCD_Clear();
+                            LCD_Set_Cursor(0,1);
+                            sprintf(buffer, "Paid: $%d", pago);
+                            LCD_putrs(buffer);
+                        }
+                        else if(teclapago == '*'){
+                            if(pago >= precio){
+                                pagado = true;
+                                break;
+                            }
+                            else{
+                                LCD_Clear();
+                                __delay_ms(5);
+                                LCD_Set_Cursor(0,0);
+                                LCD_putrs("Incomplete, pay");
+                                __delay_ms(1500);
+                                
+                                pago = 0;
+                                
+                                LCD_Clear();
+                                LCD_Set_Cursor(0,1);
+                                sprintf(buffer, "Paid: $%d", pago);
+                                LCD_putrs(buffer);
+                                
+                            }
+                        }
+                    }
+                }
+                if (pagado == true) {
+                    int cambio = pago - precio;
+                    
+                    LCD_Clear();
+                    __delay_ms(5);
+                    LCD_Set_Cursor(0,0);
+                    LCD_putrs("Pay accepted");
+                    LCD_Set_Cursor(1,0);
+                    sprintf(buffer, "Change: $%d", cambio);
+                    LCD_putrs(buffer);
+                    __delay_ms(1500);
+                    
+                    LCD_Clear();
+                    __delay_ms(5);
+                    LCD_Set_Cursor(0,0);
+                    LCD_putrs("Dispensing...:");
+                    LCD_Set_Cursor(1,0);
+                    LCD_putrs(productos[posicion]);
+
+                    if(num % 2 != 0){ //Si es numero par va a ser uno y si es impar va a ser otro
+                        for(i=0; i<=180; i+=10){
+                            movserv(1,i);
+                            __delay_ms(25);
+                        }
+                        __delay_ms(800);
+                        for(i=180; i>=0; i-=10){
+                            movserv(1,i);
+                            __delay_ms(25);
+                        }
+                    }
+                    else{
+                        for(i=0; i<=180; i+=10){
+                            movserv(2,i);
+                            __delay_ms(25);
+                        }
+                        __delay_ms(800);
+                        for(i=180; i>=0; i-=10){
+                            movserv(2,i);
+                            __delay_ms(25);
+                        }
+                    }
+                }
+                LCD_Clear();
+                LCD_Set_Cursor(0,1); //Bienvenida
+                LCD_putrs("Gracias");
+                __delay_ms(1500);
+                LCD_Clear();
+                
+                LCD_Set_Cursor(0,1); //Bienvenida
+                LCD_putrs("Welcome");
+                __delay_ms(1500);
+                LCD_Clear();
+    
+                LCD_Clear();
+                LCD_Set_Cursor(0,1);
+                LCD_putrs("Select product"); //Instruccion
+                __delay_ms(1500);
+                LCD_Clear();
+
+                LCD_Set_Cursor(0,1); // Productos
+                LCD_putrs("Options: 1-9");
+                LCD_Set_Cursor(1,1);
+ 
+            }
+            else{
+            LCD_Clear(); 
+            __delay_ms(5);
+            LCD_Set_Cursor(0,0);
+            LCD_putrs("Select Valid Num");
+            __delay_ms(1000);
+            LCD_Clear();
+            
+            LCD_Clear();
+            LCD_Set_Cursor(0,1);
+            LCD_putrs("Select product"); //Instruccion
+            __delay_ms(1500);
+            LCD_Clear();
+            
+            LCD_Set_Cursor(0,1); // Productos
+            LCD_putrs("Options: 1-9");
+            
+            }
+        } 
     }
 }
