@@ -92,3 +92,29 @@ Práctica 13
   - Archivo HEX 2
   - Circuito en formato imagen
   - Simulaciónes de Proteus
+
+Práctica 14
+  - Códigos fuente
+  - Archivo HEX 1
+  - Archivo HEX 2
+  - Circuito en formato imagen
+  - Simulación de Proteus
+
+Práctica 15
+  - Códigos MAESTRO y ESCLAVO
+  - Archivo HEX MAESTRO
+  - Archivo HEX ESCLAVO
+  - Circuito en formato imagen
+  - Simulación de Proteus
+
+Proyecto Parcial
+  - Código fuente
+  - Archivo HEX 1
+  - Circuito en formato imagen
+  - Simulación de Proteus
+
+Proyecto Final
+  - Código fuente
+  - Archivo HEX 1
+  - Circuito en formato imagen
+  - Simulación de Proteus
