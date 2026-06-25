@@ -30,7 +30,7 @@ volatile unsigned int pulso1 = 150;
 volatile unsigned int pulso2 = 150;
 volatile char state = 0;
 const  char* productos[9]= {"papitas", "gansito", "halls", 
-"refresco", "agua", "juguito", "chicles","mazapan", "paletita"};
+"refresco", "agüita", "juguito", "chicles","mazapan", "paletita"};
 
 
 void Timer1_Init(){
@@ -105,6 +105,7 @@ void main (void){
     LCD_Set_Cursor(0,1);
     LCD_putrs("Select product"); //Instruccion
     __delay_ms(1500);
+    LCD_Clear();
     
     LCD_Set_Cursor(0,1); // Productos
     LCD_putrs("Options: 1-9");
@@ -118,11 +119,13 @@ void main (void){
                 int posicion = num - 1;
                  
                 LCD_Clear();
-                LCD_putrs("Dispensing");
+                __delay_ms(5);
+                LCD_Set_Cursor(0,0);
+                LCD_putrs("Dispensing...:");
                 LCD_Set_Cursor(1,0);
                 LCD_putrs(productos[posicion]);
                  
-                if(num % 2 != 0){
+                if(num % 2 != 0){ //Si es numero par va a ser uno y si es impar va a ser otro
                     for(i=0; i<=180; i+=10){
                         movserv(1,i);
                         __delay_ms(25);
@@ -145,28 +148,46 @@ void main (void){
                     }
                 }
                 LCD_Clear();
+                LCD_Set_Cursor(0,1); //Bienvenida
+                LCD_putrs("Gracias");
+                __delay_ms(1500);
+                LCD_Clear();
+                
+                LCD_Set_Cursor(0,1); //Bienvenida
+                LCD_putrs("Welcome");
+                __delay_ms(1500);
+                LCD_Clear();
+    
+                LCD_Clear();
                 LCD_Set_Cursor(0,1);
                 LCD_putrs("Select product"); //Instruccion
                 __delay_ms(1500);
+                LCD_Clear();
 
                 LCD_Set_Cursor(0,1); // Productos
-                LCD_putrs("1 2 3 4 5 6 7 8 9");
+                LCD_putrs("Options: 1-9");
                 LCD_Set_Cursor(1,1);
+ 
             }
             else{
-            LCD_Clear();  
+            LCD_Clear(); 
+            __delay_ms(5);
+            LCD_Set_Cursor(0,0);
             LCD_putrs("Select Valid Num");
             __delay_ms(1000);
+            LCD_Clear();
             
             LCD_Clear();
             LCD_putrs("Select product"); //Instruccion
             __delay_ms(1500);
-
+            LCD_Clear();
+            
             LCD_Set_Cursor(0,1); // Productos
             LCD_putrs("Options: 1-9");
-            LCD_Set_Cursor(1,1);
             
             }
         } 
     }
 }
+
+
