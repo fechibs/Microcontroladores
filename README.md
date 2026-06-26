@@ -56,21 +56,28 @@ Práctica 7
   - Códigos fuente
   - Archivo HEX 1
   - Archivo HEX 2
-  - Circuito en formato imagen
+  - Circuito representacion en formato imagen
   - Simulaciónes de Proteus
 
 Práctica 8
   - Códigos fuente
   - Archivo HEX 1
   - Archivo HEX 2
-  - Circuito en formato imagen
+  - Circuito representacion en formato imagen
   - Simulaciónes de Proteus
 
 Práctica 9
   - Códigos fuente
   - Archivo HEX 1
   - Archivo HEX 2
-  - Circuito en formato imagen
+  - Circuito representacion en formato imagen
+  - Simulaciónes de Proteus
+
+Práctica 11
+  - Código fuente
+  - Archivo HEX 1
+  - Archivo HEX 2
+  - Circuito representacion en formato imagen
   - Simulaciónes de Proteus
 
 Práctica 11
