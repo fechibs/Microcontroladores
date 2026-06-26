@@ -1,6 +1,6 @@
 Microcontroladores
 
-EQUIPO ARES
+Hola, somos el EQUIPO ARES y en este repositorio se encuentran todas nuestras actividades de este curso. :D
 
 Integrantes
   
